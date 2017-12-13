@@ -8,7 +8,7 @@ namespace MarkdownTool
 {
    class Program
    {
-      private static readonly LogMagic.ILog log = LogMagic.L.G(typeof(Program));
+      private static readonly ILog log = L.G(typeof(Program));
 
       static int Main(string[] args)
       {
@@ -41,6 +41,17 @@ namespace MarkdownTool
          {
             log.Trace("input file {0} does not exist");
             return 2;
+         }
+
+         if(p.OutputDir == null)
+         {
+            log.Trace("output directory is required");
+            return 3;
+         }
+
+         if(!Directory.Exists(p.OutputDir))
+         {
+            Directory.CreateDirectory(p.OutputDir);
          }
 
          return 0;
