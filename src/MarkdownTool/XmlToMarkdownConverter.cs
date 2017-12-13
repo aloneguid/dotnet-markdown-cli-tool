@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using MarkdownTool.Model;
+using MarkdownTool.Styles;
 
 namespace MarkdownTool
 {
@@ -32,30 +34,26 @@ namespace MarkdownTool
       {
          string libName = _xmlDoc.SelectSingleNode("//assembly/name").InnerText;
 
-         _s.AppendLine("# Library " + libName);
-         _s.AppendLine();
-
          ICollection<DocType> types = GetTypes();
-         _s.AppendLine("## Types");
-         _s.AppendLine();
-         AddTypeTable(types);
+         ICollection<DocNamespace> namespaces = GetNamespaces(types);
+         var lib = new DocLibrary { Name = libName, Namespaces = namespaces.ToArray() };
+
+         IOutputStyle style = new SinglePageOutputStyle();
+         style.Generate(lib, _s);
 
          File.WriteAllText(_outputFile, _s.ToString());
       }
 
-      private void AddTypeTable(ICollection<DocType> types)
+      private ICollection<DocNamespace> GetNamespaces(ICollection<DocType> types)
       {
-         _s.AppendLine("|Name|Summary|");
-         _s.AppendLine("|----|-------|");
-
-         foreach(DocType dt in types)
-         {
-            _s.Append("|`");
-            _s.Append(dt.Name);
-            _s.Append("`|");
-            _s.Append(dt.Summary);
-            _s.AppendLine("|");
-         }
+         return types
+            .GroupBy(t => t.Namespace)
+            .Select(g => new DocNamespace
+            {
+               Name = g.Key,
+               Types = g.ToArray()
+            })
+            .ToList();
       }
 
       private ICollection<DocType> GetTypes()
@@ -69,11 +67,17 @@ namespace MarkdownTool
             dt.Summary = GetValue(node, "summary");
 
             XmlNodeList typeParams = node.SelectNodes("typeparam");
-            foreach(XmlNode typeParam in typeParams)
+            var rt = new List<DocType>();
+            foreach (XmlNode typeParam in typeParams)
             {
-               string name = typeParam.Attributes["name"].Value;
-               string summary = typeParam.InnerText;
+               var rti = new DocType
+               {
+                  Name = typeParam.Attributes["name"].Value,
+                  Summary = typeParam.InnerText
+               };
+               rt.Add(rti);
             }
+            if (rt.Count > 0) dt.TypeParameters = rt.ToArray();
 
 
             r.Add(dt);
