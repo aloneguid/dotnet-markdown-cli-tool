@@ -51,11 +51,11 @@ namespace MarkdownTool.Styles
 
          foreach(DocType dt in ns.Types)
          {
-            GenerateTypes(dt, output);
+            GenerateType(dt, output);
          }
       }
 
-      private void GenerateTypes(DocType dt, StringBuilder output)
+      private void GenerateType(DocType dt, StringBuilder output)
       {
          output.Append("#### ");
          output.Append(dt.SanitisedNameWithoutNamespace.HtmlEncode());
@@ -78,6 +78,27 @@ namespace MarkdownTool.Styles
                output.AppendLine();
             }
          }
+
+         if(dt.Fields != null)
+         {
+            output.Append("##### Fields");
+            output.AppendLine();
+            output.AppendLine();
+            output.AppendLine("|Name|Summary|");
+            output.AppendLine("|----|-------|");
+
+            foreach (DocType f in dt.Fields) GenerateField(f, output);
+         }
+      }
+
+      private void GenerateField(DocType dt, StringBuilder output)
+      {
+         output.Append("|");
+         output.Append(dt.NameWithoutNamespace);
+         output.Append("|");
+         output.Append(dt.Summary);
+         output.Append("|");
+         output.AppendLine();
       }
    }
 }

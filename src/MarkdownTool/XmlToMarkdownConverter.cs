@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using LogMagic;
 using MarkdownTool.Model;
 using MarkdownTool.Styles;
 
@@ -12,6 +13,7 @@ namespace MarkdownTool
 {
    class XmlToMarkdownConverter
    {
+      private static readonly ILog log = L.G(typeof(XmlToMarkdownConverter));
       private readonly string _inputFile;
       private readonly string _outputFile;
       private readonly XmlDocument _xmlDoc;
@@ -22,6 +24,7 @@ namespace MarkdownTool
       {
          _xmlDoc = new XmlDocument();
 
+         log.Trace("loading file...");
          using (FileStream fs = File.OpenRead(inputFile))
          {
             _xmlDoc.Load(fs);
@@ -34,15 +37,20 @@ namespace MarkdownTool
       {
          string libName = _xmlDoc.SelectSingleNode("//assembly/name").InnerText;
 
+         log.Trace("extracting types...");
          ICollection<DocType> types = GetTypes();
+         log.Trace("detecting namespaces...");
          ICollection<DocNamespace> namespaces = GetNamespaces(types);
          var lib = new DocLibrary { Name = libName, Namespaces = namespaces.ToArray() };
 
-
+         log.Trace("converting...");
          IOutputStyle style = new SinglePageOutputStyle();
          style.Generate(lib, _s);
 
+         log.Trace("writing to file...");
          File.WriteAllText(_outputFile, _s.ToString());
+
+         log.Trace("done.");
       }
 
 
@@ -65,10 +73,16 @@ namespace MarkdownTool
          foreach(XmlNode node in GetMembers("T:"))
          {
             DocType dt = ToDocType(node, 2);
+
             XmlNodeList typeParams = node.SelectNodes("typeparam");
             dt.TypeParameters = typeParams.Count == 0
                ? null
                : typeParams.Cast<XmlNode>().Select(n => ToDocType(n, useInnerTextAsSummary: true)).ToArray();
+
+            XmlNodeList fields = GetMembers("F:" + dt.Name);
+            dt.Fields = fields.Count == 0
+               ? null
+               : fields.Cast<XmlNode>().Select(n => ToDocType(n, prefixLength: 2)).ToArray();
 
             r.Add(dt);
          }
