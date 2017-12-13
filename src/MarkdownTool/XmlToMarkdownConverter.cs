@@ -38,11 +38,13 @@ namespace MarkdownTool
          ICollection<DocNamespace> namespaces = GetNamespaces(types);
          var lib = new DocLibrary { Name = libName, Namespaces = namespaces.ToArray() };
 
+
          IOutputStyle style = new SinglePageOutputStyle();
          style.Generate(lib, _s);
 
          File.WriteAllText(_outputFile, _s.ToString());
       }
+
 
       private ICollection<DocNamespace> GetNamespaces(ICollection<DocType> types)
       {
@@ -62,28 +64,26 @@ namespace MarkdownTool
 
          foreach(XmlNode node in GetMembers("T:"))
          {
-            var dt = new DocType();
-            dt.Name = node.Attributes["name"].Value.Substring(2);
-            dt.Summary = GetValue(node, "summary");
-
+            DocType dt = ToDocType(node, 2);
             XmlNodeList typeParams = node.SelectNodes("typeparam");
-            var rt = new List<DocType>();
-            foreach (XmlNode typeParam in typeParams)
-            {
-               var rti = new DocType
-               {
-                  Name = typeParam.Attributes["name"].Value,
-                  Summary = typeParam.InnerText
-               };
-               rt.Add(rti);
-            }
-            if (rt.Count > 0) dt.TypeParameters = rt.ToArray();
-
+            dt.TypeParameters = typeParams.Count == 0
+               ? null
+               : typeParams.Cast<XmlNode>().Select(n => ToDocType(n, useInnerTextAsSummary: true)).ToArray();
 
             r.Add(dt);
          }
 
          return r;
+      }
+
+      private DocType ToDocType(XmlNode node, int prefixLength = 0, bool useInnerTextAsSummary = false)
+      {
+         var dt = new DocType();
+         dt.Name = node.Attributes["name"].Value.Substring(prefixLength);
+         dt.Summary = useInnerTextAsSummary
+            ? node.InnerText
+            : GetValue(node, "summary");
+         return dt;
       }
 
       private string GetValue(XmlNode node, string path)

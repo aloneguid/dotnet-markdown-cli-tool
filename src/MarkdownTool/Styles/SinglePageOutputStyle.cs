@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MarkdownTool.Model;
+using NetBox.Extensions;
 
 namespace MarkdownTool.Styles
 {
@@ -50,20 +51,33 @@ namespace MarkdownTool.Styles
 
          foreach(DocType dt in ns.Types)
          {
-            Generate(dt, output);
+            GenerateTypes(dt, output);
          }
       }
 
-      private void Generate(DocType dt, StringBuilder output)
+      private void GenerateTypes(DocType dt, StringBuilder output)
       {
          output.Append("#### ");
-         output.Append(dt.NameWithoutNamespace);
+         output.Append(dt.SanitisedNameWithoutNamespace.HtmlEncode());
          output.AppendLine();
          output.AppendLine();
 
          output.Append(dt.Summary);
          output.AppendLine();
          output.AppendLine();
+
+         if(dt.TypeParameters != null)
+         {
+            foreach(DocType tp in dt.TypeParameters.Where(t => !string.IsNullOrEmpty(t.Summary)))
+            {
+               output.Append(" - **");
+               output.Append(tp.Name);
+               output.Append("** - *");
+               output.Append(tp.Summary);
+               output.Append("*");
+               output.AppendLine();
+            }
+         }
       }
    }
 }

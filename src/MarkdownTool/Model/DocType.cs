@@ -15,6 +15,8 @@ namespace MarkdownTool.Model
 
       public DocType[] TypeParameters { get; set; }
 
+      public DocType[] Fields { get; set; }
+
       public string Namespace
       {
          get
@@ -36,26 +38,28 @@ namespace MarkdownTool.Model
          }
       }
 
-      public string SanitisedName
+      public string SanitisedName => Sanitise(Name);
+
+      public string SanitisedNameWithoutNamespace => Sanitise(NameWithoutNamespace);
+
+      private string Sanitise(string s)
       {
-         get
+         Match m = GenericCountRgx.Match(s);
+         if (m.Success && TypeParameters != null)
          {
-            Match m = GenericCountRgx.Match(Name);
-            if(m.Success && TypeParameters != null)
+            string replacement = "<";
+            for (int i = 0; i < TypeParameters.Length; i++)
             {
-               string replacement = "<";
-               for(int i = 0; i < TypeParameters.Length; i++)
-               {
-                  if (i != 0) replacement += ", ";
-                  replacement += TypeParameters[i].Name;
-               }
-               replacement += ">";
-
-               return GenericCountRgx.Replace(Name, replacement);
+               if (i != 0) replacement += ", ";
+               replacement += TypeParameters[i].Name;
             }
+            replacement += ">";
 
-            return Name;
+            return GenericCountRgx.Replace(s, replacement);
          }
+
+         return s;
+
       }
    }
 }
