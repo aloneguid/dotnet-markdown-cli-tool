@@ -17,6 +17,8 @@ namespace MarkdownTool.Model
 
       public DocType[] Fields { get; set; }
 
+      public DocType[] Properties { get; set; }
+
       public string Namespace
       {
          get

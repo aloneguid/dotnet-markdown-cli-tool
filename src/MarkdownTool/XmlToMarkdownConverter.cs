@@ -84,6 +84,11 @@ namespace MarkdownTool
                ? null
                : fields.Cast<XmlNode>().Select(n => ToDocType(n, prefixLength: 2)).ToArray();
 
+            XmlNodeList properties = GetMembers("P:" + dt.Name);
+            dt.Properties = properties.Count == 0
+               ? null
+               : properties.Cast<XmlNode>().Select(n => ToDocType(n, prefixLength: 2)).ToArray();
+
             r.Add(dt);
          }
 

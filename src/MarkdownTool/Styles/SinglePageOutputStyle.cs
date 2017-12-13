@@ -89,6 +89,18 @@ namespace MarkdownTool.Styles
 
             foreach (DocType f in dt.Fields) GenerateField(f, output);
          }
+
+         if (dt.Properties != null)
+         {
+            output.Append("##### Properties");
+            output.AppendLine();
+            output.AppendLine();
+            output.AppendLine("|Name|Summary|");
+            output.AppendLine("|----|-------|");
+
+            foreach (DocType f in dt.Properties) GenerateField(f, output);
+         }
+
       }
 
       private void GenerateField(DocType dt, StringBuilder output)
