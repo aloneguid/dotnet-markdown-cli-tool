@@ -23,6 +23,9 @@
     <PackageReference Include="Config.Net" Version="4.4.0.66" />
     <PackageReference Include="LogMagic" Version="2.5.61" />
     <PackageReference Include="NetBox" Version="2.0.0.34" />
+    <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XDocument" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

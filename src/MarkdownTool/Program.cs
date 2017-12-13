@@ -13,9 +13,9 @@ namespace MarkdownTool
       static int Main(string[] args)
       {
          IParameters p = new ConfigurationBuilder<IParameters>()
-            .UseCommandLineArgs(
+            .UseCommandLineArgs(false, 
                nameof(IParameters.InputPath).PairedWith(1),
-               nameof(IParameters.OutputDir).PairedWith(2)
+               nameof(IParameters.OutputPath).PairedWith(2)
             )
             .Build();
 
@@ -25,6 +25,8 @@ namespace MarkdownTool
 
          int r = Validate(p);
          if (r != 0) return r;
+
+         new XmlToMarkdownConverter(p.InputPath, p.OutputPath).Convert();
 
          return 0;
       }
@@ -43,16 +45,14 @@ namespace MarkdownTool
             return 2;
          }
 
-         if(p.OutputDir == null)
+         if(p.OutputPath == null)
          {
-            log.Trace("output directory is required");
+            log.Trace("output path is required");
             return 3;
          }
 
-         if(!Directory.Exists(p.OutputDir))
-         {
-            Directory.CreateDirectory(p.OutputDir);
-         }
+         var dir = new FileInfo(p.OutputPath).Directory;
+         if(!dir.Exists) dir.Create();
 
          return 0;
       }

@@ -8,6 +8,6 @@ namespace MarkdownTool
    {
       string InputPath { get; }
 
-      string OutputDir { get; }
+      string OutputPath { get; }
    }
 }
