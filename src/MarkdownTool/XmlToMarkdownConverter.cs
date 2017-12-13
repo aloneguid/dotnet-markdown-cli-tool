@@ -72,22 +72,27 @@ namespace MarkdownTool
 
          foreach(XmlNode node in GetMembers("T:"))
          {
-            DocType dt = ToDocType(node, 2);
+            DocType dt = ToDocType(node);
 
             XmlNodeList typeParams = node.SelectNodes("typeparam");
             dt.TypeParameters = typeParams.Count == 0
                ? null
-               : typeParams.Cast<XmlNode>().Select(n => ToDocType(n, useInnerTextAsSummary: true)).ToArray();
+               : typeParams.Cast<XmlNode>().Select(n => ToDocPrimitive(n, useInnerTextAsSummary: true)).ToArray();
 
             XmlNodeList fields = GetMembers("F:" + dt.Name);
             dt.Fields = fields.Count == 0
                ? null
-               : fields.Cast<XmlNode>().Select(n => ToDocType(n, prefixLength: 2)).ToArray();
+               : fields.Cast<XmlNode>().Select(n => ToDocPrimitive(n, prefixLength: 2)).ToArray();
 
             XmlNodeList properties = GetMembers("P:" + dt.Name);
             dt.Properties = properties.Count == 0
                ? null
-               : properties.Cast<XmlNode>().Select(n => ToDocType(n, prefixLength: 2)).ToArray();
+               : properties.Cast<XmlNode>().Select(n => ToDocPrimitive(n, prefixLength: 2)).ToArray();
+
+            XmlNodeList methods = GetMembers("M:" + dt.Name);
+            dt.Methods = methods.Count == 0
+               ? null
+               : methods.Cast<XmlNode>().Select(n => ToDocMethod(n)).ToArray();
 
             r.Add(dt);
          }
@@ -95,9 +100,37 @@ namespace MarkdownTool
          return r;
       }
 
-      private DocType ToDocType(XmlNode node, int prefixLength = 0, bool useInnerTextAsSummary = false)
+      private DocMethod ToDocMethod(XmlNode node)
       {
-         var dt = new DocType();
+         DocPrimitive dp = ToDocPrimitive(node, 2);
+         var m = new DocMethod
+         {
+            Name = dp.Name,
+            Summary = dp.Summary
+         };
+
+         XmlNodeList typeParams = node.SelectNodes("typeparam");
+         m.TypeParameters = typeParams.Count == 0
+            ? null
+            : typeParams.Cast<XmlNode>().Select(n => ToDocPrimitive(n, useInnerTextAsSummary: true)).ToArray();
+
+         return m;
+      }
+
+      private DocType ToDocType(XmlNode node)
+      {
+         DocPrimitive dp = ToDocPrimitive(node, 2);
+         var dt = new DocType
+         {
+            Name = dp.Name,
+            Summary = dp.Summary
+         };
+         return dt;
+      }
+
+      private DocPrimitive ToDocPrimitive(XmlNode node, int prefixLength = 0, bool useInnerTextAsSummary = false)
+      {
+         var dt = new DocPrimitive();
          dt.Name = node.Attributes["name"].Value.Substring(prefixLength);
          dt.Summary = useInnerTextAsSummary
             ? node.InnerText

@@ -68,7 +68,7 @@ namespace MarkdownTool.Styles
 
          if(dt.TypeParameters != null)
          {
-            foreach(DocType tp in dt.TypeParameters.Where(t => !string.IsNullOrEmpty(t.Summary)))
+            foreach(DocPrimitive tp in dt.TypeParameters.Where(t => !string.IsNullOrEmpty(t.Summary)))
             {
                output.Append(" - **");
                output.Append(tp.Name);
@@ -87,7 +87,10 @@ namespace MarkdownTool.Styles
             output.AppendLine("|Name|Summary|");
             output.AppendLine("|----|-------|");
 
-            foreach (DocType f in dt.Fields) GenerateField(f, output);
+            foreach (DocPrimitive f in dt.Fields.OrderBy(f => f.NameWithoutNamespace))
+            {
+               GenerateField(f, output);
+            }
          }
 
          if (dt.Properties != null)
@@ -98,12 +101,41 @@ namespace MarkdownTool.Styles
             output.AppendLine("|Name|Summary|");
             output.AppendLine("|----|-------|");
 
-            foreach (DocType f in dt.Properties) GenerateField(f, output);
+            foreach (DocPrimitive f in dt.Properties.OrderBy(f => f.NameWithoutNamespace))
+            {
+               GenerateField(f, output);
+            }
+         }
+
+         if(dt.Methods != null)
+         {
+            output.Append("##### Methods");
+            output.AppendLine();
+            output.AppendLine();
+            output.AppendLine("|Name|Summary|Returns|");
+            output.AppendLine("|----|-------|-------|");
+
+            foreach (DocMethod m in dt.Methods.OrderBy(m => m.MethodNameWithoutParametersAndNamespace))
+            {
+               GenerateMethod(m, output);
+            }
          }
 
       }
 
-      private void GenerateField(DocType dt, StringBuilder output)
+      private void GenerateMethod(DocMethod m, StringBuilder output)
+      {
+         output.Append("|");
+         output.Append(m.MethodNameWithoutParametersAndNamespace);
+         output.Append("|");
+         output.Append(m.Summary);
+         output.Append("|");
+         output.Append("?");
+         output.Append("|");
+         output.AppendLine();
+      }
+
+      private void GenerateField(DocPrimitive dt, StringBuilder output)
       {
          output.Append("|");
          output.Append(dt.NameWithoutNamespace);
