@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net462</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>dotnet-markdown</PackageId>
+    <Authors>Ivan Gavryliuk (@aloneguid)</Authors>
+    <Company>Isoline Ltd.</Company>
+    <Product>.NET Markdown CLI Tool</Product>
+    <Description>.NET CLI Tool to produce markdown documentation from xml documentation</Description>
+    <AssemblyName>dotnet-markdown</AssemblyName>
+    <PackageProjectUrl>https://github.com/aloneguid/dotnet-markdown-cli-tool</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/aloneguid/dotnet-markdown-cli-tool</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>.NET CLI Markdown</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Config.Net" Version="4.4.0.66" />
+    <PackageReference Include="LogMagic" Version="2.5.61" />
+  </ItemGroup>
+
+</Project>

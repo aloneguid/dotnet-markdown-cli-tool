@@ -1,0 +1,16 @@
+version: 1.0.0-preview-{build}
+pull_requests:
+  do_not_increment_build_number: true
+skip_tags: true
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+before_build:
+- ps: .\appveyor.ps1
+build:
+  project: src/MarkdownTool.sln
+  verbosity: minimal
+test: off
+artifacts:
+- path: src/MarkdownTool/bin/**/*.nupkg
+deploy: off
