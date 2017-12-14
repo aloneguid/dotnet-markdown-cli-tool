@@ -1,8 +1,31 @@
-# dotnet-markdown-cli-tool
-.NET Markdown CLI Tool experiment
+# dotnet markdown CLI tool
 
+This utility is a command-line extension to the `dotnet` command allowing you to generate a single-page markdown API documentation for a `C#` library.
 
+## Status
 
-## Links
+Still in dev, but actively used for real!
 
-- [XML File](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/processing-the-xml-file)
+## Adding to the project
+
+In your `.csproj` file add the following section:
+
+```xml
+<ItemGroup>
+  <DotNetCliToolReference Include="dotnet-markdown" Version="1.0.4" />
+</ItemGroup>
+```
+
+The version should be whatever latest version of this package is on NuGet i.e. 
+
+## Running
+
+One the reference is added, don't forget to restore the packages for you project, after which you can generate the documentation to a single file by typing
+
+```bash
+dotnet markdown <path-to-input-xml-file> <path-to-output-markdown-file>
+```
+
+### Links
+
+- [Processing XML File](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/processing-the-xml-file)

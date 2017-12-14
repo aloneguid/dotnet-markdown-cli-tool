@@ -48,6 +48,7 @@ namespace MarkdownTool
          style.Generate(lib, _s);
 
          log.Trace("writing to file...");
+         if (File.Exists(_outputFile)) File.Delete(_outputFile);
          File.WriteAllText(_outputFile, _s.ToString());
 
          log.Trace("done.");
@@ -92,7 +93,7 @@ namespace MarkdownTool
             XmlNodeList methods = GetMembers("M:" + dt.Name);
             dt.Methods = methods.Count == 0
                ? null
-               : methods.Cast<XmlNode>().Select(n => ToDocMethod(n)).ToArray();
+               : methods.Cast<XmlNode>().Select(n => ToDocMethod(n, dt)).ToArray();
 
             r.Add(dt);
          }
@@ -100,19 +101,27 @@ namespace MarkdownTool
          return r;
       }
 
-      private DocMethod ToDocMethod(XmlNode node)
+      private DocMethod ToDocMethod(XmlNode node, DocType parent)
       {
          DocPrimitive dp = ToDocPrimitive(node, 2);
          var m = new DocMethod
          {
             Name = dp.Name,
-            Summary = dp.Summary
+            Summary = dp.Summary,
+            Parent = parent
          };
 
          XmlNodeList typeParams = node.SelectNodes("typeparam");
          m.TypeParameters = typeParams.Count == 0
             ? null
             : typeParams.Cast<XmlNode>().Select(n => ToDocPrimitive(n, useInnerTextAsSummary: true)).ToArray();
+
+         XmlNodeList methodParams = node.SelectNodes("param");
+         m.Parameters = methodParams.Count == 0
+            ? null
+            : methodParams.Cast<XmlNode>().Select(n => ToDocPrimitive(n, useInnerTextAsSummary: true)).ToArray();
+
+         m.Returns = GetValue(node, "returns");
 
          return m;
       }

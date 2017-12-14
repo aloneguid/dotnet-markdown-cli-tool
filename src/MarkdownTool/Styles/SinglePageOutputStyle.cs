@@ -34,7 +34,7 @@ namespace MarkdownTool.Styles
       {
          output.Append(" - [");
          output.Append(ns.Name);
-         output.Append("](###");
+         output.Append("](##");
          output.Append(ns.Name);
          output.Append(") *(");
          output.Append(ns.Types.Length);
@@ -44,7 +44,7 @@ namespace MarkdownTool.Styles
 
       private void Generate(DocNamespace ns, StringBuilder output)
       {
-         output.Append("### ");
+         output.Append("## ");
          output.Append(ns.Name);
          output.AppendLine();
          output.AppendLine();
@@ -57,7 +57,7 @@ namespace MarkdownTool.Styles
 
       private void GenerateType(DocType dt, StringBuilder output)
       {
-         output.Append("#### ");
+         output.Append("### ");
          output.Append(dt.SanitisedNameWithoutNamespace.HtmlEncode());
          output.AppendLine();
          output.AppendLine();
@@ -81,7 +81,7 @@ namespace MarkdownTool.Styles
 
          if(dt.Fields != null)
          {
-            output.Append("##### Fields");
+            output.Append("#### Fields");
             output.AppendLine();
             output.AppendLine();
             output.AppendLine("|Name|Summary|");
@@ -95,7 +95,7 @@ namespace MarkdownTool.Styles
 
          if (dt.Properties != null)
          {
-            output.Append("##### Properties");
+            output.Append("#### Properties");
             output.AppendLine();
             output.AppendLine();
             output.AppendLine("|Name|Summary|");
@@ -109,30 +109,97 @@ namespace MarkdownTool.Styles
 
          if(dt.Methods != null)
          {
-            output.Append("##### Methods");
+            output.Append("#### Methods");
             output.AppendLine();
             output.AppendLine();
-            output.AppendLine("|Name|Summary|Returns|");
-            output.AppendLine("|----|-------|-------|");
+
+            output.AppendLine("|Name|Summary|");
+            output.AppendLine("|----|-------|");
+               
 
             foreach (DocMethod m in dt.Methods.OrderBy(m => m.MethodNameWithoutParametersAndNamespace))
             {
-               GenerateMethod(m, output);
+               GenerateMethodShort(m, output);
             }
          }
 
       }
 
-      private void GenerateMethod(DocMethod m, StringBuilder output)
+      private void GenerateMethodShort(DocMethod m, StringBuilder output)
       {
          output.Append("|");
-         output.Append(m.MethodNameWithoutParametersAndNamespace);
+
+         output.Append(m.GetBeautifulParameterString());
+
          output.Append("|");
-         output.Append(m.Summary);
-         output.Append("|");
-         output.Append("?");
+
+         if(!string.IsNullOrEmpty(m.Summary))
+         {
+            output.Append(m.Summary);
+         }
+
          output.Append("|");
          output.AppendLine();
+      }
+
+      private void GenerateMethod(DocMethod m, StringBuilder output)
+      {
+         //output.Append("**");
+         output.Append("|**");
+
+         output.Append(m.GetBeautifulParameterString());
+
+         output.Append("**|");
+
+         if (!string.IsNullOrEmpty(m.Summary))
+         {
+            output.Append(m.Summary);
+         }
+
+         output.Append("|");
+
+         if (!string.IsNullOrEmpty(m.Returns))
+         {
+            output.Append(m.Returns);
+         }
+
+         output.Append("|");
+
+         output.AppendLine();
+         output.AppendLine();
+
+
+         /*if (m.Parameters != null || m.TypeParameters != null)
+         {
+            if(m.TypeParameters != null)
+            {
+               foreach(DocPrimitive p in m.TypeParameters)
+               {
+                  AppendListItem(output, p);
+               }
+            }
+
+            if (m.Parameters != null)
+            {
+               foreach (DocPrimitive p in m.Parameters)
+               {
+                  AppendListItem(output, p);
+               }
+            }
+         }*/
+      }
+
+      private void AppendListItem(StringBuilder output, DocPrimitive p)
+      {
+         if (!string.IsNullOrEmpty(p.Summary))
+         {
+            output.Append(" - **");
+            output.Append(p.Name);
+            output.Append("**");
+            output.Append(" - *");
+            output.Append(p.Summary);
+            output.Append("*<br>");
+         }
       }
 
       private void GenerateField(DocPrimitive dt, StringBuilder output)

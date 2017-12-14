@@ -15,7 +15,7 @@ namespace MarkdownTool.Model
 
       public string SanitisedNameWithoutNamespace => Sanitise(NameWithoutNamespace);
 
-      private string Sanitise(string s)
+      public string Sanitise(string s)
       {
          Match m = GenericCountRgx.Match(s);
          if (m.Success && TypeParameters != null)
