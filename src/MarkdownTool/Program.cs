@@ -2,6 +2,7 @@
 using LogMagic;
 using NetBox.Extensions;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace MarkdownTool
@@ -13,9 +14,9 @@ namespace MarkdownTool
       static int Main(string[] args)
       {
          IParameters p = new ConfigurationBuilder<IParameters>()
-            .UseCommandLineArgs(false, 
-               nameof(IParameters.InputPath).PairedWith(1),
-               nameof(IParameters.OutputPath).PairedWith(2)
+            .UseCommandLineArgs(
+               new KeyValuePair<string, int>(nameof(IParameters.InputPath), 1),
+               new KeyValuePair<string, int>(nameof(IParameters.OutputPath), 2)
             )
             .Build();
 
