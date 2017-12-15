@@ -26,7 +26,7 @@ namespace MarkdownTool
          int r = Validate(p);
          if (r != 0) return r;
 
-         new XmlToMarkdownConverter(p.InputPath, p.OutputPath).Convert();
+         new XmlToMarkdownConverter(p.InputPath, p.OutputPath, p.SourceSearchPath, p.SourceBasePath).Convert();
 
          return 0;
       }
@@ -51,7 +51,7 @@ namespace MarkdownTool
             return 3;
          }
 
-         var dir = new FileInfo(p.OutputPath).Directory;
+         DirectoryInfo dir = new FileInfo(p.OutputPath).Directory;
          if(!dir.Exists) dir.Create();
 
          return 0;

@@ -9,6 +9,15 @@ namespace MarkdownTool.Styles
 {
    class SinglePageOutputStyle : IOutputStyle
    {
+      private readonly Dictionary<string, LocationPin> _entryToLocation;
+      private readonly string _pathPrefix;
+
+      public SinglePageOutputStyle(Dictionary<string, LocationPin> entryToLocation, string pathPrefix)
+      {
+         _entryToLocation = entryToLocation;
+         _pathPrefix = pathPrefix;
+      }
+
       public void Generate(DocLibrary library, StringBuilder output)
       {
          output.AppendLine("# Library " + library.Name);
@@ -57,8 +66,20 @@ namespace MarkdownTool.Styles
 
       private void GenerateType(DocType dt, StringBuilder output)
       {
+         string typeLink = GetEntityLink(dt.Name);
+
          output.Append("### ");
+         if (typeLink != null)
+         {
+            output.Append("[");
+         }
          output.Append(dt.SanitisedNameWithoutNamespace.HtmlEncode());
+         if(typeLink != null)
+         {
+            output.Append("](");
+            output.Append(typeLink);
+            output.Append(")");
+         }
          output.AppendLine();
          output.AppendLine();
 
@@ -210,6 +231,15 @@ namespace MarkdownTool.Styles
          output.Append(dt.Summary);
          output.Append("|");
          output.AppendLine();
+      }
+
+      private string GetEntityLink(string entityName)
+      {
+         if (_entryToLocation == null || _pathPrefix == null) return null;
+
+         if (!_entryToLocation.TryGetValue(entityName, out LocationPin pin)) return null;
+
+         return _pathPrefix + "/" + pin.Path.Replace('\\', '/');
       }
    }
 }

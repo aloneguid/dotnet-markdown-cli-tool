@@ -16,11 +16,13 @@ namespace MarkdownTool
       private static readonly ILog log = L.G(typeof(XmlToMarkdownConverter));
       private readonly string _inputFile;
       private readonly string _outputFile;
+      private readonly string _sourceTreeBase;
+      private readonly string _sourcePathBase;
       private readonly XmlDocument _xmlDoc;
       private readonly StringBuilder _s = new StringBuilder();
       private static readonly Regex _wsRgx = new Regex("\\s+", RegexOptions.Multiline | RegexOptions.Compiled);
 
-      public XmlToMarkdownConverter(string inputFile, string outputFile)
+      public XmlToMarkdownConverter(string inputFile, string outputFile, string sourceTreeBase, string sourcePathBase)
       {
          _xmlDoc = new XmlDocument();
 
@@ -31,6 +33,8 @@ namespace MarkdownTool
          }
 
          _outputFile = outputFile;
+         _sourceTreeBase = sourceTreeBase;
+         _sourcePathBase = sourcePathBase;
       }
 
       public void Convert()
@@ -43,9 +47,19 @@ namespace MarkdownTool
          ICollection<DocNamespace> namespaces = GetNamespaces(types);
          var lib = new DocLibrary { Name = libName, Namespaces = namespaces.ToArray() };
 
+         Dictionary<string, LocationPin> entryToLocation = null;
+         if (_sourceTreeBase != null)
+         {
+            SourceTree st = null;
+            log.Trace("building source tree...");
+            st = new SourceTree(_sourceTreeBase);
+            entryToLocation = st.Build();
+         }
+
          log.Trace("converting...");
-         IOutputStyle style = new SinglePageOutputStyle();
+         IOutputStyle style = new SinglePageOutputStyle(entryToLocation, _sourcePathBase);
          style.Generate(lib, _s);
+
 
          log.Trace("writing to file...");
          if (File.Exists(_outputFile)) File.Delete(_outputFile);

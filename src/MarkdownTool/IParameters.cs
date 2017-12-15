@@ -9,5 +9,9 @@ namespace MarkdownTool
       string InputPath { get; }
 
       string OutputPath { get; }
+
+      string SourceSearchPath { get; }
+
+      string SourceBasePath { get; }
    }
 }
