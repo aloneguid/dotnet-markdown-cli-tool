@@ -23,7 +23,7 @@ The version should be whatever latest version of this package is on NuGet i.e.
 One the reference is added, don't forget to restore the packages for you project, after which you can generate the documentation to a single file by typing
 
 ```bash
-dotnet markdown <path-to-input-xml-file> <path-to-output-markdown-file>
+dotnet markdown in:<path-to-input-xml-file> out:<path-to-output-markdown-file>
 ```
 
 ### Links
